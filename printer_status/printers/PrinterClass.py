@@ -1,6 +1,6 @@
 import re
 import threading
-
+import selenium
 # std::string URLTopbar = ".internal/cgi-bin/dynamic/topbar.html";
 # std::string URLStatus = ".internal/cgi-bin/dynamic/printer/PrinterStatus.html";
 
