@@ -106,20 +106,18 @@
     <div class="container">
         <div class="row printer-container">
             {% for printer in printers %}
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card printer-card" onclick="toggleCard(this)">
                     <h2>{{ printer.name }}</h2>
                     <p></p>
                     <p></p>
                     <p></p>
                     <div class="additional-details">
-                        <p>Toner: {{ printer.toner_status }}</p>
+                        <p></p>
                         <!-- List of trays -->
                         <p>Trays:</p>
                         <ul>
-                            {% for tray in printer.trays %}
-                            <li>{{ tray.name }}: {{ tray.status }}</li>
-                            {% endfor %}
+                            <li></li>
                         </ul>
 
                         <!-- Add more details here -->
@@ -172,6 +170,7 @@
                 name: printerName
             },
             success: function (response) {
+                console.log(response['status']);
                 if (response['status'] == 'offline') {
                     card.css('background-color', '#f8d7da');
                 } else {
@@ -182,12 +181,14 @@
                 var additionalDetails = card.find('.additional-details');
                 var tonerStatus = additionalDetails.find('p:nth-child(1)');
                 var traysList = additionalDetails.find('ul');
-                card.find('p:nth-child(2)').html(`<a href="http://${printer['address']}" target="_blank">${printer['address']}</a>`);
+                if (printer['status'] != 'offline') {
+                   
+                    card.find('p:nth-child(2)').html(`<a href="http://${printer['address']}" target="_blank">${printer['address']}</a>`);
+                }
                 // card.find('p:nth-child(3)').text(printer['status']);
                 card.find('p:nth-child(3)').html(`<span class="status-badge ${printer['status']}">${printer['status']}</span>`);
                 card.find('p:nth-child(4)').text(printer['location']);
-                console.log(printer['cyan_cartridge']);
-                if ((printer.cyan_cartridge >=0  || printer.yellow_catridge >= 0 || printer.magenta_catridge>=0)){
+                if (printer.isColor == true){
                     var toner = document.createElement("div");
                     
                     var yellow = document.createElement("div");
@@ -244,7 +245,19 @@
 
                 traysList.empty();
                 printer['trays'].forEach(function (tray) {
-                    traysList.append(`<li>${tray.name}: ${tray.status} ${tray.capacity}: ${tray.size} </li>`);
+                    // traysList.append(`<li>${tray.name}: ${tray.status} ${tray.capacity}: ${tray.size} </li>`);
+                    // create a div and then append status to it and create a visual effect for the current capacity of the tray and append size
+                    var trayInfo = document.createElement("div");
+                    // trayInfo.classList.add("progress");
+                    // trayInfo.classList.add("bg-info");
+                    // trayInfo.setAttribute("style", "height: 20px;");
+                    // trayInfo.setAttribute("style", "width: " + tray.capacity + "%");
+                    // trayInfo.setAttribute("aria-valuenow", tray.capacity);
+                    // trayInfo.setAttribute("aria-valuemin", "0");
+                    // trayInfo.setAttribute("aria-valuemax", "100");
+                    // trayInfo.innerHTML = tray.capacity + "%";
+                    traysList.append(`<li>${tray.name}: ${tray.status} ${trayInfo.outerHTML}: ${tray.size} </li>`);
+
                     if (tray.status =='LOW') {
                         // YELLOW
                         card.css('background-color', '#fff3cd');
