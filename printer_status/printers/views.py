@@ -53,9 +53,13 @@ class Printer:
         self.black_cartridge =""
 
     def get_url_topbar(self):
+        if self.address != "":
+            return "http://"+self.address + self.url_topbar
         return "http://"+self.name + self.url_topbar
 
     def get_url_status(self):
+        if self.address != "":
+            return "http://"+self.address + self.url_status
         return "http://"+self.name + self.url_status
 
     def getHtml(self, url):
@@ -79,6 +83,7 @@ class Printer:
         self.getLocaton()
         self.getAddress()
         self.getTonerPercentage()
+        print(self.toner_percentage)
         if self.toner_percentage == "" or self.toner_percentage == "Couldn\'t find toner percentage":
             self.isColor = True
             self.getCatridges()
@@ -312,8 +317,15 @@ def load():
                     if newline.__contains__("$") and not newline.startswith("#"):
                         # printer.name = newline.split("$")[0]
                         # remove white spaces
+                        # mi-a300b-prn1$Lexmark XS864$10.64.64.160
                         printer.name = newline.split("$")[0].strip()
-                        printer.model = newline.split("$")[1].strip()
+                        newline = newline.split("$")[1]
+                        # if the line has another + then it has the ip address
+                        if newline.__contains__("+"):
+                            printer.model = newline.split("+")[0].strip()
+                            printer.address = newline.split("+")[1].strip()
+                        else:
+                            printer.model = newline.strip()
                         PrinterList.append(printer)
 
     file.close()
