@@ -7,6 +7,8 @@ import selenium
 import re
 from bs4 import BeautifulSoup
 import json
+import pygame
+from pygame import mixer
 # Create your views here.
 
 # load the printers
@@ -19,6 +21,8 @@ printers_list = "../Printers.txt"
 oldModelList = ['Lexmark XS955', 'Lexmark XS864', 'Lexmark XM3150', 'Lexmark XM7155', 'Lexmark XM9155','Lexmark X954']
 newModelList = ['Lexmark XC9255']
 
+pygame.init()
+mixer.init()
 
 
 didLoad = False
@@ -54,12 +58,13 @@ class Printer:
 
     def get_url_topbar(self):
         if self.address != "":
-            return "http://"+self.address + self.url_topbar
+            print("Address: " + self.address)
+            return "http://"+self.address + "/cgi-bin/dynamic/topbar.html"
         return "http://"+self.name + self.url_topbar
 
     def get_url_status(self):
         if self.address != "":
-            return "http://"+self.address + self.url_status
+            return "http://"+self.address + "/cgi-bin/dynamic/printer/PrinterStatus.html"
         return "http://"+self.name + self.url_status
 
     def getHtml(self, url):
@@ -129,6 +134,8 @@ class Printer:
             self.getHtml(self.get_url_topbar())
             if self.html == "":
                 self.printer_status = "offline"
+                mixer.music.load('../printer_status/printers/templates/samir.mp3')
+                mixer.music.play()
             else:
                 soup = BeautifulSoup(self.html, 'html.parser')
                 status = soup.find('table', class_='statusBox').text.strip()
@@ -212,10 +219,14 @@ class Printer:
             self.toner_percentage = "Couldn't find toner percentage"
             return
         soup = BeautifulSoup(self.html, 'html.parser')
-        toner_percentage_pattern = re.compile(r'Black Cartridge\s*~(\d+)%')
+        # either blac cartridge or black toner
+        toner_percentage_pattern = re.compile(r'Black Cartridge: (\d+)%')
         toner_percentage_match = toner_percentage_pattern.search(str(soup))
         self.toner_percentage = toner_percentage_match.group(1) if toner_percentage_match else 'Couldn\'t find toner percentage'
-
+        if self.toner_percentage == 'Couldn\'t find toner percentage':
+            toner_percentage_pattern = re.compile(r'Black Toner: (\d+)%')
+            toner_percentage_match = toner_percentage_pattern.search(str(soup))
+            self.toner_percentage = toner_percentage_match.group(1) if toner_percentage_match else 'Couldn\'t find toner percentage'
 
 
     def handle_error(self, url, response):
@@ -326,6 +337,7 @@ def load():
                             printer.address = newline.split("+")[1].strip()
                         else:
                             printer.model = newline.strip()
+                            print(printer.model)
                         PrinterList.append(printer)
 
     file.close()
@@ -403,6 +415,9 @@ def update(request):
         # print(printer.printer_status)
         if printer.printer_status == "" or printer.printer_status == None:
             printer.printer_status = "offline"
+            # play song here
+            # samir.mp3
+
         x = printer
         # x.pop('session')
         # x.pop('buffer')

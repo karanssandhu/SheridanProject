@@ -185,10 +185,10 @@
                 var additionalDetails = card.find('.additional-details');
                 var tonerStatus = additionalDetails.find('p:nth-child(1)');
                 var traysList = additionalDetails.find('ul');
-                // if (response['status'] == 'offline') {
-                //     traysList.empty();
-                //     return 
-                // }
+                if (response['status'] == 'offline') {
+                    traysList.empty();
+                    return 
+                }
                 // Update printer information
               
                 if (printer['status'] != 'offline') {
