@@ -16,7 +16,7 @@ URLStatus = ".internal/cgi-bin/dynamic/printer/PrinterStatus.html"
 
 printers_list = "../Printers.txt"
 
-oldModelList = ['Lexmark XS955', 'Lexmark XS864', 'Lexmark XM3150', 'Lexmark XM7155', 'Lexmark XM9155']
+oldModelList = ['Lexmark XS955', 'Lexmark XS864', 'Lexmark XM3150', 'Lexmark XM7155', 'Lexmark XM9155','Lexmark X954']
 newModelList = ['Lexmark XC9255']
 
 
@@ -72,222 +72,6 @@ class Printer:
             self.status_colour = 0b001000
         return self.html
 
-
-    # def update(self):
-    #     try:
-    #         # Fetch topbar HTML
-    #         url_topbar = self.get_url_topbar()
-    #         response = ""
-    #         try:
-    #             response = self.session.get(url_topbar, timeout=5)
-    #         except requests.Timeout:
-    #             # Handle timeout error
-    #             print(f"Timeout occurred for URL: {url_topbar}")
-    #         except requests.RequestException as e:
-    #             # Handle other request exceptions
-    #             print(f"An error occurred during the request: {e}")
-            
-    #         if response == "":
-    #             return 
-    #         if response.status_code ==200:
-    #             page = urlopen(url_topbar)
-    #             html_bytes = page.read()
-    #             html = html_bytes.decode("utf-8")
-
-    #             # Parse the HTML
-    #             soup = BeautifulSoup(html, 'html.parser')
-
-    #             # Extract the sleep status from the HTML where the class is statusline
-    #             # it can be a div or a td or a span
-    #             # status = soup.find('div', class_='statusline').text.strip()
-    #             # if status == "":
-                
-    #             status = soup.find('table', class_='statusBox').text.strip()
-    #             self.printer_status = status
-
-    #             # Extract the location
-    #             location_tag = soup.find(string=re.compile(r'Location:'))
-    #             if location_tag:
-    #                 self.location = location_tag.split('Location: ')[1].strip()
-    #             else:
-    #                 self.location = "Location not found (error Parsing)"
-    #                 print('Location not found')
-    #             # Extract the address
-    #             address_tag = soup.find(string=re.compile(r'Address:'))
-    #             if address_tag:
-    #                 self.address = address_tag.split('Address: ')[1].strip()
-    #             else:
-    #                 self.address = "Address not found (error Parsing)"
-    #                 print('Address not found')
-
-
-
-    #         if response.status_code == 200 and "<html class=\"top_bar\">" in html:
-    #             self.html_top_bar = html
-    #         else:
-    #             self.html_top_bar = ""
-    #             self.buffer = ""
-    #             self.status = "Network Error: " + str(response.status_code)
-    #             self.status_colour = 0b001000
-
-    #         # Fetch status HTML
-    #         url_status = self.get_url_status()
-    #         try:
-    #             response = self.session.get(url_status, timeout=5)
-    #         except requests.Timeout:
-    #             # Handle timeout error
-    #             print(f"Timeout occurred for URL: {url_status}")
-    #         except requests.RequestException as e:
-    #             # Handle other request exceptions
-    #             print(f"An error occurred during the request: {e}")
-            
-    #         if response.status_code ==200:
-    #             page = urlopen(url_status)
-    #             html_bytes = page.read()
-    #             html = html_bytes.decode("utf-8")
-
-            
-    #             soup = BeautifulSoup(html, 'html.parser')
-
-    #             # Parse Toner Status and Percentage
-    #             toner_status_pattern = re.compile(r'Toner Status:\s*(\w+)')
-    #             toner_status_match = soup.find(string=toner_status_pattern)
-    #             self.toner_status = toner_status_match.group(1) if toner_status_match else 'Couldn\'t find toner status'
-
-               
-
-
-    #             toner_percentage_pattern = re.compile(r'Black Cartridge\s*~(\d+)%')
-    #             toner_percentage_match = toner_percentage_pattern.search(str(soup))
-    #             self.toner_percentage = toner_percentage_match.group(1) if toner_percentage_match else 'Couldn\'t find toner percentage'
-
-
-    #              # if toner status is not there look for cartridge status
-    #             if self.toner_percentage == "" or self.toner_percentage == "Couldn\'t find toner percentage":
-    #                 # look for cyan cartridge and the status 
-    #                 # <tbody>
-    #                 # <tr>
-    #                 # <td width="66%" bgcolor="#00ffff" title="66%">&nbsp;</td>
-    #                 # <td width="34%" bgcolor="#ffffff" title="66%">&nbsp;</td>
-    #                 # </tr>
-    #                 # </tbody>
-    #                 # the percentage of the first width is the percentage of the cartridge
-                    
-    #                 self.cyan_cartridge = soup.find('td', bgcolor="#00ffff")['title']
-    #                 self.magenta_cartridge = soup.find('td', bgcolor="#ff00ff")['title']
-    #                 self.yellow_cartridge = soup.find('td', bgcolor="#ffff00")['title']
-
-    #             # Parse Tray Information
-
-    #             # print(html)
-    #             # Parse Tray Information
-
-    #             # Print Toner Status and Percentage
-    #             print("Toner Status:", self.toner_status)
-    #             print("Toner Percentage:", self.toner_percentage)
-    #             # Find the table containing tray information
-    #             tray_tables = soup.findAll('table', class_='status_table')
-    #             tray_table = tray_tables[1]
-
-    #             # Find all rows in the table (excluding the header row)
-    #             tray_rows = tray_table.find_all('tr')[1:]
-
-    #             # print(tray_rows)
-    #             # Iterate over each tray row
-    #             for row in tray_rows:
-    #                 columns = row.find_all('td')
-    #                 tray_name = columns[0].text.strip()
-    #                 if tray_name.startswith("Tray"):
-    #                     tray = Tray()
-    #                     tray.name = tray_name
-    #                     tray.status = columns[1].text.strip()
-    #                     tray.capacity = columns[3].text.strip()
-    #                     tray.size = columns[4].text.strip()
-    #                     tray.tray_type = columns[5].text.strip()
-    #                     self.trays.append(tray)
-
-    #         if response.status_code == 200 and "<html class=\"top_bar\">" in html:
-    #             self.html_status = html
-    #         else:
-    #             self.html_status = ""
-    #             self.buffer = ""
-    #             self.status = "Network Error: " + str(response.status_code)
-    #             self.status_colour = 0b001000
-
-    #     except requests.exceptions.RequestException as e:
-    #         self.buffer = ""
-    #         self.status = "Network Error: " + str(e)
-    #         self.status_colour = 0b001000
-
-
-    # def update(self):
-    #     try:
-    #         # Fetch topbar HTML
-    #         url_topbar = self.get_url_topbar()
-    #         response = self.session.get(url_topbar, timeout=5)
-
-    #         if response.status_code != 200:
-    #             self.handle_error(url_topbar, response)
-    #             return
-
-    #         html = response.text
-
-    #         # Parse the HTML
-    #         soup = BeautifulSoup(html, 'html.parser')
-
-    #         # Extract the sleep status from the HTML where the class is statusline
-    #         status = soup.find('table', class_='statusBox').text.strip()
-    #         self.printer_status = status
-
-    #         # Extract the location
-    #         location_tag = soup.find(string=re.compile(r'Location:'))
-    #         self.location = location_tag.split('Location: ')[1].strip() if location_tag else "Location not found (error Parsing)"
-            
-    #         # Extract the address
-    #         address_tag = soup.find(string=re.compile(r'Address:'))
-    #         self.address = address_tag.split('Address: ')[1].strip() if address_tag else "Address not found (error Parsing)"
-
-    #         # Fetch status HTML
-    #         url_status = self.get_url_status()
-    #         response = self.session.get(url_status, timeout=5)
-
-    #         if response.status_code != 200:
-    #             self.handle_error(url_status, response)
-    #             return
-
-    #         html = response.text
-    #         soup = BeautifulSoup(html, 'html.parser')
-
-    #         # Parse Toner Status and Percentage
-    #         toner_status_pattern = re.compile(r'Toner Status:\s*(\w+)')
-    #         toner_status_match = soup.find(string=toner_status_pattern)
-    #         self.toner_status = toner_status_match.group(1) if toner_status_match else "Couldn't find toner status"
-
-    #         toner_percentage_pattern = re.compile(r'Black Cartridge\s*~(\d+)%')
-    #         toner_percentage_match = toner_percentage_pattern.search(str(soup))
-    #         self.toner_percentage = toner_percentage_match.group(1) if toner_percentage_match else "Couldn't find toner percentage"
-
-    #         # Parse Tray Information
-    #         tray_tables = soup.findAll('table', class_='status_table')
-    #         tray_table = tray_tables[1]
-    #         tray_rows = tray_table.find_all('tr')[1:]
-
-    #         # Iterate over each tray row
-    #         self.trays = []
-    #         for row in tray_rows:
-    #             columns = row.find_all('td')
-    #             tray_name = columns[0].text.strip()
-    #             if tray_name.startswith("Tray"):
-    #                 tray = Tray()
-    #                 tray.name = tray_name
-    #                 tray.status = columns[1].text.strip()
-    #                 tray.capacity = columns[3].text.strip()
-    #                 tray.size = columns[4].text.strip()
-    #                 tray.tray_type = columns[5].text.strip()
-    #                 self.trays.append(tray)
-
-    #     except requests.RequestException as e:
-    #         self.handle_error("Network Error", e)
 
 
     def update(self):
@@ -371,6 +155,7 @@ class Printer:
                 self.magenta_cartridge = soup.find('td', bgcolor="#ff00ff")['title']
                 self.yellow_cartridge = soup.find('td', bgcolor="#ffff00")['title']
                 self.black_cartridge = soup.find('td', bgcolor="#000000")['title']
+                print(self.cyan_cartridge + " " + self.magenta_cartridge + " " + self.yellow_cartridge + " " + self.black_cartridge)
         elif self.model in newModelList:
             url = "http://" + self.name
             self.getHtml(url)
@@ -394,6 +179,7 @@ class Printer:
     def getLocaton(self):
 
         if self.model in oldModelList:
+            # url = http://mi-b246a-prn1.internal/
             self.getHtml(self.get_url_topbar())       
             if self.html == "":
                 self.location = "Couldn't find location"
@@ -595,6 +381,9 @@ def update(request):
         # printer = PrinterList.__getitem__
         # find the printer in the list of printers
         printer_obj = next((x for x in PrinterList if x.name == printer_name), None)
+        if printer_obj == None:
+            load()
+            printer_obj = next((x for x in PrinterList if x.name == printer_name), None)
         printer = Printer()
         printer.name = printer_obj.name
         printer.model = printer_obj.model
@@ -611,7 +400,9 @@ def update(request):
         for tray in x.trays:
             traysList.append(tray.__dict__)
         x.trays = traysList
-        return JsonResponse({'name': x.name, 'status': x.printer_status, 'location': x.location, 'address': x.address, 'toner_status': x.toner_status, 'toner_percentage': x.toner_percentage, 'trays': x.trays, 'cyan_cartridge': x.cyan_cartridge, 'magenta_cartridge': x.magenta_cartridge, 'yellow_cartridge': x.yellow_cartridge,'isColor': x.isColor}, safe=False)
+        if x.isColor == True:
+            return JsonResponse({'name': x.name, 'status': x.printer_status, 'location': x.location, 'address': x.address, 'toner_status': x.toner_status, 'toner_percentage': x.toner_percentage, 'trays': x.trays, 'cyan_cartridge': x.cyan_cartridge, 'magenta_cartridge': x.magenta_cartridge, 'yellow_cartridge': x.yellow_cartridge,'black_cartridge':x.black_cartridge,'isColor': x.isColor}, safe=False)
+        return JsonResponse({'name': x.name, 'status': x.printer_status, 'location': x.location, 'address': x.address, 'toner_status': x.toner_status, 'toner_percentage': x.toner_percentage, 'trays': x.trays, 'isColor': x.isColor}, safe=False)
 
 ############################################################################################################
 ############################################################################################################

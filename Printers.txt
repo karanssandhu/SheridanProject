@@ -1,5 +1,5 @@
 
-mi-b246a-prn1$Lexmark XM9155
+#mi-b246a-prn1$Lexmark XM9155
 
 mi-a300b-prn1$Lexmark XS864
 mi-a148g-prn1$Lexmark XM7155
@@ -16,7 +16,7 @@ mi-b130-prn1$Lexmark XM9155
 
 mi-b202-prn1$Lexmark XM9155
 mi-b242-prn1$Lexmark XM9155
-#mi-b246a-prn1$Lexmark X954
+mi-b246a-prn1$Lexmark X954
 
 mi-b264a-prn1$Lexmark XM9155
 

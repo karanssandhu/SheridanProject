@@ -19,7 +19,7 @@
     .printer-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
+        /* gap: 20px; */
     }
 
     .printer-card {
@@ -142,6 +142,7 @@
 </body>
 <script>
 
+    printers =[];
 
     $(document).ready(function () {
 
@@ -151,18 +152,23 @@
         setInterval(function () {
             if (index >= cards.length) {
                 index = 0; // Reset index to 0 when all printers have been updated
+
+            }
+            if (printers.length != index) {
+                var card = $(cards[index]);
+                printers.push(card.find("h2").text());
             }
 
             var card = $(cards[index]);
             var printerName = card.find("h2").text();
-            updatePrinter(printerName, card);
+            updatePrinter(printerName, card, index);
             index++; // Move to the next printer
 
         }, 1000);
 
     });
 
-    function updatePrinter(printerName, card) {
+    function updatePrinter(printerName, card, index) {
         $.ajax({
             url: '/update',
             method: 'GET',
@@ -170,20 +176,32 @@
                 name: printerName
             },
             success: function (response) {
-                console.log(response['status']);
                 if (response['status'] == 'offline') {
                     card.css('background-color', '#f8d7da');
                 } else {
                     card.css('background-color', '#d4edda');
                 }
-                // Update printer information
                 var printer = response;
                 var additionalDetails = card.find('.additional-details');
                 var tonerStatus = additionalDetails.find('p:nth-child(1)');
                 var traysList = additionalDetails.find('ul');
+                // if (response['status'] == 'offline') {
+                //     traysList.empty();
+                //     return 
+                // }
+                // Update printer information
+              
                 if (printer['status'] != 'offline') {
                    
                     card.find('p:nth-child(2)').html(`<a href="http://${printer['address']}" target="_blank">${printer['address']}</a>`);
+                }
+
+                // find the printer in the printers array and update it
+                if (index != -1) {
+                    printers[index] = printer;
+                }
+                else{
+                    printers.push(printer);
                 }
                 // card.find('p:nth-child(3)').text(printer['status']);
                 card.find('p:nth-child(3)').html(`<span class="status-badge ${printer['status']}">${printer['status']}</span>`);
@@ -195,32 +213,50 @@
                     yellow.classList.add("progress");
                     yellow.classList.add("bg-warning");
                     yellow.setAttribute("style", "height: 20px;");
-                    yellow.setAttribute("style", "width: " + printer.yellow_catridge + "%");
-                    yellow.setAttribute("aria-valuenow", printer.yellow_catridge);
+                    yellow.setAttribute("style", "width: " + printer['yellow_cartridge'] );
+                    yellow.setAttribute("aria-valuenow", printer['yellow_cartridge']);
                     yellow.setAttribute("aria-valuemin", "0");
                     yellow.setAttribute("aria-valuemax", "100");
-                    yellow.innerHTML = printer.yellow_catridge + "%";
+                    yellow.innerHTML = printer['yellow_cartridge'];
 
                     var magenta = document.createElement("div");
                     magenta.classList.add("progress");
                     magenta.classList.add("bg-danger");
                     magenta.setAttribute("style", "height: 20px;");
-                    magenta.setAttribute("style", "width: " + printer.magenta_catridge + "%");
-                    magenta.setAttribute("aria-valuenow", printer.magenta_catridge);
+                    magenta.setAttribute("style", "width: " + printer['magenta_cartridge'] );
+                    magenta.setAttribute("aria-valuenow", printer['magenta_cartridge']);
                     magenta.setAttribute("aria-valuemin", "0");
                     magenta.setAttribute("aria-valuemax", "100");
-                    magenta.innerHTML = printer.magenta_catridge + "%";
+                    magenta.innerHTML = printer['magenta_cartridge'];
 
                     var cyan = document.createElement("div");
                     cyan.classList.add("progress");
                     cyan.classList.add("bg-primary");
                     cyan.setAttribute("style", "height: 20px;");
-                    cyan.setAttribute("style", "width: " + printer.cyan_cartridge + "%");
-                    cyan.setAttribute("aria-valuenow", printer.cyan_cartridge);
+                    cyan.setAttribute("style", "width: " + printer['cyan_cartridge']);
+                    cyan.setAttribute("aria-valuenow", printer['cyan_cartridge']);
                     cyan.setAttribute("aria-valuemin", "0");
                     cyan.setAttribute("aria-valuemax", "100");
-                    cyan.innerHTML = printer.cyan_cartridge + "%";
-                    
+                    cyan.innerHTML = printer['cyan_cartridge'];
+
+
+                    var black = document.createElement("div");
+                    black.classList.add("progress");
+                    black.classList.add("bg-dark");
+                    black.setAttribute("style", "height: 20px;");
+                    black.setAttribute("style", " width: " + printer['black_cartridge']);
+                    black.setAttribute("aria-valuenow", printer['black_cartridge']);
+                    black.setAttribute("aria-valuemin", "0");
+                    black.setAttribute("aria-valuemax", "100");
+                    black.innerHTML = printer['black_cartridge'];
+                    var blackLabel = document.createElement("div");
+                    blackLabel.classList.add("progress-bar-label");
+                    blackLabel.innerText = printer['black_cartridge'] + "%";
+                    blackLabel.style.color = "#fff"; // Set the label text color to white for better visibility
+                    blackLabel.style.fontSize = "12px";
+                    black.appendChild(blackLabel);
+
+                    toner.appendChild(black);
                     toner.appendChild(yellow);
                     toner.appendChild(magenta);
                     toner.appendChild(cyan);
@@ -232,6 +268,7 @@
 
                     var tonerBar = document.createElement("div");
                     tonerBar.classList.add("progress-bar");
+                    tonerBar.classList.add("bg-dark");
                     tonerBar.setAttribute("role", "progressbar");
                     tonerBar.setAttribute("style", "width: " + printer.toner_percentage + "%");
                     tonerBar.setAttribute("aria-valuenow", printer.toner_percentage);
@@ -248,15 +285,7 @@
                     // traysList.append(`<li>${tray.name}: ${tray.status} ${tray.capacity}: ${tray.size} </li>`);
                     // create a div and then append status to it and create a visual effect for the current capacity of the tray and append size
                     var trayInfo = document.createElement("div");
-                    // trayInfo.classList.add("progress");
-                    // trayInfo.classList.add("bg-info");
-                    // trayInfo.setAttribute("style", "height: 20px;");
-                    // trayInfo.setAttribute("style", "width: " + tray.capacity + "%");
-                    // trayInfo.setAttribute("aria-valuenow", tray.capacity);
-                    // trayInfo.setAttribute("aria-valuemin", "0");
-                    // trayInfo.setAttribute("aria-valuemax", "100");
-                    // trayInfo.innerHTML = tray.capacity + "%";
-                    traysList.append(`<li>${tray.name}: ${tray.status} ${trayInfo.outerHTML}: ${tray.size} </li>`);
+                    traysList.append(`<li>${tray.name}: ${tray.status} ${tray.capacity}: ${tray.size} </li>`);
 
                     if (tray.status =='LOW') {
                         // YELLOW
